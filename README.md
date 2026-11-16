@@ -56,3 +56,104 @@ Este projeto propõe explorar de que forma a **Internet das Coisas (IoT)** pode 
 - Jira
 
 ---
+ Deploy
+
+A aplicação está publicada em: 
+
+### Como acessar
+
+1. Abra a URL acima no navegador. A raiz (`/`) redireciona para a **Central de Ocorrências** (`/forum/`).
+2. Para registrar uma ocorrência, use **Registrar ocorrência** no menu (`/forum/inserir/`). Não é necessário criar conta: quem não está autenticado aparece como *anônimo*.
+3. Abra uma ocorrência para ver os diagnósticos, adicionar um novo ou marcar um como útil.
+4. Para ver o simulador, acesse **Sobre o projeto** (`/efeito_domino/`) e clique em **Explorar simulador**. Ele exibe a ocorrência mais recente registrada.
+5. A área administrativa fica em `/admin/` e exige um superusuário. As credenciais não são públicas e podem ser solicitadas à equipe.
+
+---
+
+## ⚙️ Como rodar o projeto
+
+**Pré-requisitos:** Python 3.12 ou superior e Git.
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/leledornas/projetos2_.git
+
+cd projetos2_2026
+```
+2. Crie e ative um ambiente virtual:
+```bash
+python -m venv venv
+source venv/bin/activate        # Windows: venv\Scripts\activate
+```
+3. Instale as dependências:
+```bash
+pip install -r requirements.txt
+```
+4. Configure as variáveis de ambiente. Copie o modelo e edite o `.env`:
+```bash
+cp .env.example .env            # Windows: copy .env.example .env
+```
+```env
+SECRET_KEY=troque-por-uma-chave-secreta
+ENVIRONMENT=development
+```
+5. Crie as tabelas do banco (SQLite local):
+```bash
+python manage.py migrate
+```
+6. Execute o projeto:
+```bash
+python manage.py runserver
+```
+Acesse http://127.0.0.1:8000/
+
+Opcional: para usar o `/admin/`, crie um superusuário com `python manage.py createsuperuser`.
+
+## 👥 Membros da equipe
+
+### Ciência da Computação
+ 
+| Nome Completo | E-mail Institucional |
+|---|---|
+| Letícia Almeida Abreu de Siqueira  | laas2@cesar.school |
+| Letícia Dornas de Araújo  | lda2@cesar.school |
+| Maria Júlia Oliveira Dionísio  | mjod@cesar.school |
+| Maria Monalysa da Silva  | mms2@cesar.school |
+| Manuela Brayner Medeiros de Araújo  | mbma3@cesar.school |
+| Matheus Araújo Guilhermino  | mag3@cesar.school |
+| Milena Siqueira Araújo  | msa4@cesar.school |
+| Rafaela Dubeux Godoy  | rdg@cesar.school |
+
+ 
+### Design
+ 
+| Nome Completo | E-mail Institucional |
+|---|---|
+| Artur Henrique Ribeiro Câmara de Oliveira  | ahrco@cesar.school |
+| Cora Jordão Magri | cjm@cesar.school |
+| Luana Malinconico Pereira | lmp3@cesar.school |
+| Mateus Rodrigues de Lira Assunção | mrla@cesar.school |
+
+## 🔄 Ex-Integrantes
+ 
+<!-- Preencher somente se houve mudança na composição do grupo. Caso contrário, remover ou indicar "Sem alterações no grupo". -->
+ 
+| Nome Completo | E-mail Institucional | Entrada | Saída |
+|---|---|---|---|
+|  |  |  |  |
+ 
+---
+ 
+## 🤝 Parceiro
+ 
+**BzuTech** — tecnologia de IoT voltada à eficiência operacional das empresas.
+ 
+## 📡 Painéis de Acompanhamento
+ 
+- 🗂️ **Jira:** [link do quadro](https://cesar-team-qchgyaex.atlassian.net/jira/software/projects/FDS/boards/3/backlog)
+- 🐞 **Bug tracker:** [GitHub Issues](https://github.com/leticiasiqueira-dev/projetos2_2026/issues)
+- 🎨 **Figma:** [link do protótipo](#)
+
+## 📄 Licença
+ 
+*[Preencher conforme o projeto avançar]*
