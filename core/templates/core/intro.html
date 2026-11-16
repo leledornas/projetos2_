@@ -1,0 +1,82 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IoTech · Simulador de Efeito Dominó</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core/css/intro.css' %}">
+</head>
+<body>
+  <div class="app">
+
+    <header class="topbar">
+      <a class="logo" href="{% url 'core:intro' %}" aria-label="IoTech">
+        <img src="{% static 'core/img/logo.svg' %}" alt="IoTech" width="80" height="21">
+      </a>
+
+      <nav class="stepper" aria-label="Progresso">
+        {% for passo in passos %}
+          <div class="step{% if passo.ativo %} is-active{% endif %}">
+            <span class="step__bar"></span>
+            <span class="step__label">{{ passo.label }}</span>
+          </div>
+        {% endfor %}
+      </nav>
+    </header>
+
+    <main class="hero">
+      <span class="badge">
+        <span class="badge__dot"></span>
+        Simulador de Efeito Dominó da BzuTech
+      </span>
+
+      <h1 class="title">
+        <span class="title__line title__line--white">Um pequeno problema</span>
+        <span class="title__line title__line--magenta">pode gerar</span>
+        <span class="title__line title__line--violet">grandes impactos.</span>
+      </h1>
+
+      <p class="lead">
+        Descubra como a falha de uma única máquina pode afetar<br>
+        toda a cadeia produtiva e como o monitoramento IoT pode<br>
+        auxiliar na identificação antecipada de problemas.
+      </p>
+
+      <div class="chain" role="list">
+        {% for etapa in etapas %}
+          <div class="machine" role="listitem">
+            <svg class="machine__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span class="machine__code">{{ etapa.codigo }}</span>
+            <span class="machine__name">{{ etapa.nome }}</span>
+          </div>
+          {% if not forloop.last %}<span class="chain__link" aria-hidden="true"></span>{% endif %}
+        {% endfor %}
+      </div>
+
+      <a class="cta" id="btn-comecar" href="#simulacao-1">
+        Começar experiência
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </a>
+
+      <p class="hint">Você vivenciará duas simulações e verá um comparativo ao final</p>
+    </main>
+
+    <footer class="footer">
+      <span>BZU • IoTech — Simulador de Efeito Dominó</span>
+      <span>Valores ilustrativos · Prova de conceito</span>
+    </footer>
+
+  </div>
+  <script src="{% static 'core/js/intro.js' %}"></script>
+</body>
+</html>
