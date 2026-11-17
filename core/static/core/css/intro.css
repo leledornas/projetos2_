@@ -271,3 +271,7 @@ body {
 }
 
 @media (max-width: 600px) { .lead br { display: none; } }
+
+/* ---------- Transição de saída ---------- */
+.app { transition: opacity 0.22s ease; }
+.app.is-leaving { opacity: 0; }

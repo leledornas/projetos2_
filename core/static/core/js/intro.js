@@ -14,8 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       document.dispatchEvent(new CustomEvent("simulador:iniciar"));
-      // TODO: trocar por redirecionamento para a view da Simulação 1
-      // window.location.href = "/simulacao-1/";
+      document.querySelector(".app").classList.add("is-leaving");
+      setTimeout(() => { window.location.href = btn.href; }, 220);
     });
   }
 });
