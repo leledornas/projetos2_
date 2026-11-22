@@ -25,6 +25,27 @@ MAQUINAS_SIM1 = [
      "eficiencia": 99, "uptime": "4h 22m"},
 ]
 
+# Sequência da falha (Tela 3): cada evento aparece na linha do tempo e muda o
+# estado de uma máquina. "atraso" = ms de espera ANTES do evento (ritmo da demo).
+SEQUENCIA_FALHA = [
+    {"tempo": "00:00", "maquina": 2, "estado": "falha", "alerta": True, "atraso": 600,
+     "texto": "Máquina 02 ultrapassa o limite de temperatura. Nenhum alerta é emitido.",
+     "temp": 86.0, "vib": 2.40, "efic": 74},
+    {"tempo": "00:12", "maquina": 2, "estado": "falha", "alerta": True, "atraso": 1800,
+     "texto": "Máquina 02 para de operar.",
+     "temp": 93.0, "vib": 3.10, "efic": 0},
+    {"tempo": "00:20", "maquina": 3, "estado": "parada", "alerta": False, "atraso": 1800,
+     "texto": "Máquina 03 fica sem peças para montar e para.",
+     "efic": 0},
+    {"tempo": "00:31", "maquina": 4, "estado": "parada", "alerta": False, "atraso": 1800,
+     "texto": "Máquina 04 fica sem material e a finalização para.",
+     "efic": 0},
+    {"tempo": "00:45", "maquina": 1, "estado": "parada", "alerta": False, "atraso": 1800,
+     "texto": "Máquina 01 não tem para onde enviar o material e para.",
+     "efic": 0},
+    {"tempo": "00:50", "maquina": None, "estado": None, "alerta": True, "atraso": 1500,
+     "texto": "Linha de produção totalmente parada."},
+]
 
 def _passos(ativo):
     return [{"label": l, "ativo": i == ativo} for i, l in enumerate(PASSOS_LABELS)]
@@ -39,6 +60,7 @@ def simulacao1(request):
     return render(request, "core/simulacao1.html", {
         "maquinas": MAQUINAS_SIM1,
         "selecionada": 2,
+        "sequencia": SEQUENCIA_FALHA,
         "passos": _passos(1),
     })
 
