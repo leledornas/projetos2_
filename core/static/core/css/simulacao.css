@@ -320,3 +320,33 @@
 @media (max-width: 520px) {
   .sim__tags { flex-wrap: wrap; }
 }
+
+/* ---------- Tela 3: propagação da falha (efeito dominó) ---------- */
+.mcard.is-failing.is-selected { box-shadow: 0 0 22px rgba(240, 68, 60, 0.35); }
+
+.mcard.is-stopped { border-color: rgba(255, 149, 20, 0.6); background: rgba(80, 40, 6, 0.35); }
+.mcard.is-stopped.is-selected { box-shadow: 0 0 22px rgba(255, 149, 20, 0.25); }
+.mcard.is-stopped .mcard__status { color: #ff9514; }
+.mcard.is-stopped .dot { background: #ff9514; box-shadow: 0 0 8px rgba(255, 149, 20, 0.6); }
+.mcard.is-failing .mcard__icon { color: #f0443c; }
+.mcard.is-stopped .mcard__icon { color: #ff9514; }
+
+/* Status do painel de detalhes */
+.detail__status[data-estado="falha"]  { color: #f0443c; }
+.detail__status[data-estado="falha"] .dot  { background: #f0443c; box-shadow: 0 0 8px rgba(240, 68, 60, 0.7); }
+.detail__status[data-estado="parada"] { color: #ff9514; }
+.detail__status[data-estado="parada"] .dot { background: #ff9514; box-shadow: 0 0 8px rgba(255, 149, 20, 0.6); }
+
+/* Métrica acima do limite */
+.bar__fill.is-over { background: linear-gradient(90deg, #f0443c, #ff7a70); }
+.metric__value.is-over { color: #f0443c; }
+
+/* Entrada dos itens da linha do tempo */
+.timeline__item { animation: timeline-in 0.35s ease both; }
+@keyframes timeline-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .timeline__item { animation: none; }
+}
