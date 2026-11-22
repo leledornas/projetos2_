@@ -25,6 +25,30 @@ MAQUINAS_SIM1 = [
      "eficiencia": 99, "uptime": "4h 22m"},
 ]
 
+# Sequência da falha (Tela 3): cada evento entra na linha do tempo e, quando tem
+# "maquina", muda o estado dela. "tom" = cor do marcador (ok / erro / aviso).
+# "atraso" = ms de espera ANTES do evento (ritmo da animação).
+SEQUENCIA_FALHA = [
+    {"hora": "10:00", "texto": "Linha em operação normal",
+     "tom": "ok", "atraso": 0},
+    {"hora": "10:15", "texto": "Máquina 02 — falha completa",
+     "tom": "erro", "atraso": 800, "maquina": 2, "estado": "erro", "efic": 0},
+    {"hora": "10:45", "texto": "Produção acumula atraso",
+     "tom": "aviso", "atraso": 800, "maquina": 3, "estado": "afetada", "efic": 0},
+    {"hora": "11:30", "texto": "Pedido impactado — prazo em risco",
+     "tom": "aviso", "atraso": 800, "maquina": 4, "estado": "afetada", "efic": 0},
+    {"hora": "12:00", "texto": "Custos estimados em crescimento",
+     "tom": "aviso", "atraso": 800, "maquina": 1, "estado": "afetada", "efic": 0},
+]
+
+# Cards "Impacto estimado (simulado)" — valores ilustrativos
+IMPACTOS = [
+    {"valor": 140, "prefixo": "",   "sufixo": "min", "rotulo": "Tempo perdido", "sub": "produção"},
+    {"valor": 72,  "prefixo": "",   "sufixo": "h",   "rotulo": "Atraso",        "sub": "no pedido"},
+    {"valor": 38,  "prefixo": "R$", "sufixo": "k",   "rotulo": "Custo est.",    "sub": "ilustrativo"},
+    {"valor": 4,   "prefixo": "",   "sufixo": "/4",  "rotulo": "Etapas",        "sub": "afetadas"},
+]
+
 
 def _passos(ativo):
     return [{"label": l, "ativo": i == ativo} for i, l in enumerate(PASSOS_LABELS)]
@@ -39,8 +63,11 @@ def simulacao1(request):
     return render(request, "core/simulacao1.html", {
         "maquinas": MAQUINAS_SIM1,
         "selecionada": 2,
+        "sequencia": SEQUENCIA_FALHA,
+        "impactos": IMPACTOS,
         "passos": _passos(1),
     })
+
 
 def site_oficial(request):
     # Frame "site-oficial" do Figma (node 1-266): 1167x976, fundo #08041A.
