@@ -1,13 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
   const cards = document.querySelectorAll(".mcard");
+  const app = document.querySelector(".app");
   const $ = (id) => document.getElementById(id);
 
-  const ROTULOS = { aguardando: "Aguardando", falha: "Falha", parada: "Parada" };
+  const ROTULOS_CARD = { aguardando: "Aguardando", erro: "Erro", afetada: "Afetada" };
+  const ROTULOS_PAINEL = { aguardando: "Aguardando", erro: "Offline", afetada: "Afetada" };
+  const AVISOS = {
+    erro: "Máquina interrompida — sem leitura",
+    afetada: "Máquina parada — aguardando material",
+  };
+
   const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
-
   const pct = (v, max) => Math.max(0, Math.min(100, (v / max) * 100));
+  const reduzMovimento = window.matchMedia &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  // Atualiza o painel de detalhes com os dados da máquina clicada
+  // Helpers tolerantes: se um elemento não existir, não quebram o resto
+  const setText = (id, txt) => { const el = $(id); if (el) el.textContent = txt; };
+  const toggle = (id, cls, on) => { const el = $(id); if (el) el.classList.toggle(cls, on); };
+  const mostrar = (id) => {
+    const el = $(id);
+    if (!el) return;
+    el.hidden = false;
+    el.classList.add("aparece");
+  };
+
+  // ---------- Painel de detalhes ----------
   function inspecionar(card) {
     cards.forEach((c) => {
       const ativo = c === card;
@@ -17,27 +35,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const d = card.dataset;
     const estado = d.estado || "aguardando";
-    $("d-status").dataset.estado = estado;
-    $("d-status-txt").textContent = ROTULOS[estado];
-    $("d-titulo").textContent = `${d.nome} — ${d.etapa}`;
-    $("d-temp").textContent = `${d.temp}°C`;
-    $("d-temp-lim").textContent = `Limite: ${d.tempLim}°C`;
-    $("d-vib").textContent = `${d.vib} mm/s`;
-    $("d-vib-lim").textContent = `Limite: ${d.vibLim} mm/s`;
-    $("d-efic").textContent = `${d.efic}%`;
-    $("d-uptime").textContent = d.uptime;
+    const offline = estado === "erro";        // Máquina em erro: sem leitura
+
+    const st = $("d-status");
+    if (st) st.dataset.estado = estado;
+    setText("d-status-txt", ROTULOS_PAINEL[estado]);
+    setText("d-titulo", `${d.nome} — ${d.etapa}`);
+
+    setText("d-temp", offline ? "—" : `${d.temp}°C`);
+    setText("d-temp-lim", `Limite: ${d.tempLim}°C`);
+    setText("d-vib", offline ? "—" : `${d.vib} mm/s`);
+    setText("d-vib-lim", `Limite: ${d.vibLim} mm/s`);
+    setText("d-efic", `${d.efic}%`);
+    setText("d-uptime", offline ? "—" : d.uptime);
 
     // Escalas ilustrativas: temperatura 0–100 °C, vibração 0–4 mm/s
-    $("d-temp-bar").style.width = pct(parseFloat(d.temp), 100) + "%";
-    $("d-vib-bar").style.width = pct(parseFloat(d.vib), 4) + "%";
+    const tempBar = $("d-temp-bar");
+    const vibBar = $("d-vib-bar");
+    if (tempBar) tempBar.style.width = offline ? "0%" : pct(parseFloat(d.temp), 100) + "%";
+    if (vibBar) vibBar.style.width = offline ? "0%" : pct(parseFloat(d.vib), 4) + "%";
 
-    // Acima do limite → vermelho
-    const tempAlta = parseFloat(d.temp) > parseFloat(d.tempLim);
-    const vibAlta = parseFloat(d.vib) > parseFloat(d.vibLim);
-    $("d-temp-bar").classList.toggle("is-over", tempAlta);
-    $("d-temp").classList.toggle("is-over", tempAlta);
-    $("d-vib-bar").classList.toggle("is-over", vibAlta);
-    $("d-vib").classList.toggle("is-over", vibAlta);
+    const tempAlta = !offline && parseFloat(d.temp) > parseFloat(d.tempLim);
+    const vibAlta = !offline && parseFloat(d.vib) > parseFloat(d.vibLim);
+    if (tempBar) tempBar.classList.toggle("is-over", tempAlta);
+    if (vibBar) vibBar.classList.toggle("is-over", vibAlta);
+    toggle("d-temp", "is-over", tempAlta);
+    toggle("d-vib", "is-over", vibAlta);
+    toggle("d-temp", "is-dim", offline);
+    toggle("d-vib", "is-dim", offline);
+    toggle("d-uptime", "is-dim", offline);
+    toggle("d-efic", "is-zero", estado !== "aguardando");
+
+    const aviso = $("d-aviso");
+    if (aviso) {
+      aviso.hidden = !AVISOS[estado];
+      setText("d-aviso-txt", AVISOS[estado] || "");
+    }
   }
 
   cards.forEach((card) => card.addEventListener("click", () => inspecionar(card)));
@@ -46,20 +79,19 @@ document.addEventListener("DOMContentLoaded", () => {
   try {
     if (inicial) inspecionar(inicial);
   } catch (e) {
-    // Não deixa um elemento faltando no HTML impedir o resto do script
     console.error("[simulacao] erro ao montar o painel de detalhes:", e);
   }
 
-  // ---------- Tela 3: sequência da falha (efeito dominó) ----------
-  const dadosSeq = document.getElementById("sequencia-falha");
+  // ---------- Tela 3: resultado da falha ----------
+  const dadosSeq = $("sequencia-falha");
   const sequencia = dadosSeq ? JSON.parse(dadosSeq.textContent) : [];
 
   function aplicarEstado(card, estado) {
     card.dataset.estado = estado;
-    card.classList.toggle("is-failing", estado === "falha");
-    card.classList.toggle("is-stopped", estado === "parada");
+    card.classList.toggle("is-failing", estado === "erro");
+    card.classList.toggle("is-afetada", estado === "afetada");
     const txt = card.querySelector(".mcard__status-txt");
-    if (txt) txt.textContent = ROTULOS[estado];
+    if (txt) txt.textContent = ROTULOS_CARD[estado];
   }
 
   function adicionarNaLinhaDoTempo(ev) {
@@ -69,14 +101,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (vazio) vazio.remove();
 
     const li = document.createElement("li");
-    li.className = "timeline__item" + (ev.alerta ? " is-alert" : "");
-    const tempo = document.createElement("span");
-    tempo.className = "timeline__time";
-    tempo.textContent = ev.tempo;
+    li.className = `timeline__item tom-${ev.tom || "ok"}`;
+    const hora = document.createElement("span");
+    hora.className = "timeline__time";
+    hora.textContent = ev.hora;
     const texto = document.createElement("span");
     texto.className = "timeline__text";
     texto.textContent = ev.texto;
-    li.append(tempo, texto);
+    li.append(hora, texto);
     lista.appendChild(li);
   }
 
@@ -86,8 +118,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const card = document.querySelector(`.mcard[data-id="${ev.maquina}"]`);
     if (!card) return;
-    if (ev.temp !== undefined) card.dataset.temp = ev.temp.toFixed(1);
-    if (ev.vib !== undefined) card.dataset.vib = ev.vib.toFixed(2);
     if (ev.efic !== undefined) card.dataset.efic = String(ev.efic);
     aplicarEstado(card, ev.estado);
 
@@ -97,31 +127,70 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  // Contagem animada dos cards de impacto
+  function animarImpactos() {
+    document.querySelectorAll(".impacto").forEach((box) => {
+      const alvo = parseFloat(box.dataset.valor) || 0;
+      const prefixo = box.dataset.prefixo || "";
+      const sufixo = box.dataset.sufixo || "";
+      const el = box.querySelector(".impacto__valor");
+      if (!el) return;
+      const formatar = (v) => `${prefixo}${Math.round(v)}${sufixo}`;
+
+      if (reduzMovimento) { el.textContent = formatar(alvo); return; }
+
+      const duracao = 1000;
+      const inicio = performance.now();
+      const passo = (agora) => {
+        const t = Math.min(1, (agora - inicio) / duracao);
+        const suave = 1 - Math.pow(1 - t, 3);          // ease-out
+        el.textContent = formatar(alvo * suave);
+        if (t < 1) requestAnimationFrame(passo);
+      };
+      requestAnimationFrame(passo);
+    });
+  }
+
   const btnFalha = $("btn-falha");
   let emAndamento = false;
 
-  if (btnFalha) {
-    btnFalha.addEventListener("click", async () => {
-      console.log("[simulacao] clique em Iniciar falha; eventos:", sequencia.length);
-      if (!Array.isArray(sequencia) || sequencia.length === 0) {
-        console.error('[simulacao] sequência vazia: confira "sequencia" no views.py e o json_script no template.');
-        return;
-      }
-      if (emAndamento) return;
-      emAndamento = true;
-      btnFalha.disabled = true;
-      const rotuloBtn = $("btn-falha-txt");
-      if (rotuloBtn) rotuloBtn.textContent = "Falha em andamento…";
-      document.dispatchEvent(new CustomEvent("simulador:iniciar-falha"));
+  async function iniciarFalha() {
+    if (emAndamento) return;
+    if (!Array.isArray(sequencia) || sequencia.length === 0) {
+      console.error('[simulacao] sequência vazia: confira "sequencia" no views.py e o json_script no template.');
+      return;
+    }
+    emAndamento = true;
+    document.dispatchEvent(new CustomEvent("simulador:iniciar-falha"));
 
-      for (const ev of sequencia) {
-        await esperar(ev.atraso);
-        executarEvento(ev);
-      }
+    // A Tela 3 surge assim que o botão é apertado
+    if (btnFalha) btnFalha.disabled = true;
+    if (app) app.classList.add("is-falha");
+    setText("linha-titulo", "Simulação de falha direcionada");
+    mostrar("painel-impacto");
 
-      if (rotuloBtn) rotuloBtn.textContent = "Falha concluída";
-      document.dispatchEvent(new CustomEvent("simulador:falha-concluida"));
-      // Próxima etapa (Intervalo / Simulação 2) ainda não existe.
+    for (const ev of sequencia) {
+      await esperar(reduzMovimento ? 0 : ev.atraso);
+      executarEvento(ev);
+    }
+
+    setText("sim-lead", "Simulação concluída. Uma falha isolada gerou impacto em toda a cadeia.");
+    animarImpactos();
+    await esperar(reduzMovimento ? 0 : 600);
+    mostrar("insight");
+    mostrar("btn-proxima");
+    document.dispatchEvent(new CustomEvent("simulador:falha-concluida"));
+  }
+
+  if (btnFalha) btnFalha.addEventListener("click", iniciarFalha);
+
+  // "Continuar para a próxima simulação": rota ainda não existe
+  const btnProxima = $("btn-proxima");
+  if (btnProxima) {
+    btnProxima.addEventListener("click", (e) => {
+      e.preventDefault();
+      document.dispatchEvent(new CustomEvent("simulador:proxima"));
+      // TODO: apontar para a Simulação 2 quando existir
     });
   }
 });
