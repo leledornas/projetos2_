@@ -449,3 +449,13 @@
 @media (max-width: 860px) {
   .impactos { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Dica enquanto nenhuma máquina está selecionada */
+.sim__dica {
+  align-self: center;
+  margin-top: 10px;
+  font-size: 10px;
+  font-weight: 300;
+  color: #4d3a86;
+}
+.app.is-falha .sim__dica { display: none; }

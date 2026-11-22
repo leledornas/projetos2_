@@ -62,10 +62,10 @@ def intro(request):
 
 
 def simulacao1(request):
-    # Máquina 02 vem selecionada por padrão
+    # Nenhuma máquina vem selecionada: o usuário escolhe qual vai falhar
     return render(request, "core/simulacao1.html", {
         "maquinas": MAQUINAS_SIM1,
-        "selecionada": 2,
+        "selecionada": None,
         "sequencia": SEQUENCIA_FALHA,
         "impactos": IMPACTOS,
         "passos": _passos(1),

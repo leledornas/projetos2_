@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", () => {
     afetada: "Máquina parada — aguardando material",
   };
 
+  const btnFalha = $("btn-falha");
+  let emAndamento = false;
+
   const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
   const pct = (v, max) => Math.max(0, Math.min(100, (v / max) * 100));
   const reduzMovimento = window.matchMedia &&
@@ -26,12 +29,48 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   // ---------- Painel de detalhes ----------
+  // Painel vazio: nenhuma máquina selecionada
+  function limparPainel() {
+    const st = $("d-status");
+    if (st) st.dataset.estado = "aguardando";
+    setText("d-status-txt", "Aguardando seleção");
+    setText("d-titulo", "Selecione uma máquina");
+    setText("d-temp", "—");
+    setText("d-temp-lim", "Limite: —");
+    setText("d-vib", "—");
+    setText("d-vib-lim", "Limite: —");
+    setText("d-efic", "—");
+    setText("d-uptime", "—");
+    ["d-temp-bar", "d-vib-bar"].forEach((id) => {
+      const b = $(id);
+      if (b) { b.style.width = "0%"; b.classList.remove("is-over"); }
+    });
+    ["d-temp", "d-vib"].forEach((id) => toggle(id, "is-over", false));
+    toggle("d-efic", "is-zero", false);
+    const aviso = $("d-aviso");
+    if (aviso) aviso.hidden = true;
+  }
+
+  // "Iniciar falha" só vale com uma máquina escolhida
+  function atualizarBotao() {
+    const temSelecao = !!document.querySelector(".mcard.is-selected");
+    if (btnFalha && !emAndamento) btnFalha.disabled = !temSelecao;
+    const dica = $("dica-selecao");
+    if (dica) dica.hidden = temSelecao;
+  }
+
   function inspecionar(card) {
     cards.forEach((c) => {
       const ativo = c === card;
       c.classList.toggle("is-selected", ativo);
       c.setAttribute("aria-selected", ativo ? "true" : "false");
     });
+
+    if (!card) {
+      limparPainel();
+      atualizarBotao();
+      return;
+    }
 
     const d = card.dataset;
     const estado = d.estado || "aguardando";
@@ -71,13 +110,16 @@ document.addEventListener("DOMContentLoaded", () => {
       aviso.hidden = !AVISOS[estado];
       setText("d-aviso-txt", AVISOS[estado] || "");
     }
+    toggle("d-efic", "is-dim", false);
+    atualizarBotao();
   }
 
   cards.forEach((card) => card.addEventListener("click", () => inspecionar(card)));
 
-  const inicial = document.querySelector(".mcard.is-selected") || cards[0];
+  // Nenhuma máquina vem selecionada, a não ser que o HTML marque uma
+  const inicial = document.querySelector(".mcard.is-selected");
   try {
-    if (inicial) inspecionar(inicial);
+    inspecionar(inicial);          // null → painel vazio e botão desabilitado
   } catch (e) {
     console.error("[simulacao] erro ao montar o painel de detalhes:", e);
   }
@@ -163,19 +205,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const btnFalha = $("btn-falha");
-  let emAndamento = false;
-
   async function iniciarFalha() {
     if (emAndamento) return;
     if (!Array.isArray(sequencia) || sequencia.length === 0) {
       console.error('[simulacao] sequência vazia: confira "sequencia" no views.py e o json_script no template.');
       return;
     }
-    emAndamento = true;
-
     // A falha começa na máquina que está selecionada agora
-    const origem = document.querySelector(".mcard.is-selected") || cards[0];
+    const origem = document.querySelector(".mcard.is-selected");
+    if (!origem) return;                       // nenhuma máquina escolhida
+    emAndamento = true;
     const fila = ordemDePropagacao(origem);
     document.dispatchEvent(new CustomEvent("simulador:iniciar-falha", {
       detail: { maquina: origem.dataset.id },

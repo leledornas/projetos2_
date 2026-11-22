@@ -97,8 +97,8 @@
       <!-- Detalhe + linha do tempo -->
       <div class="grid">
         <section class="panel panel--detail" id="detalhe" aria-live="polite">
-          <span class="detail__status" id="d-status" data-estado="aguardando"><span class="dot"></span><span id="d-status-txt">Aguardando</span></span>
-          <h2 class="detail__title" id="d-titulo">Máquina 02 — Processamento</h2>
+          <span class="detail__status" id="d-status" data-estado="aguardando"><span class="dot"></span><span id="d-status-txt">Aguardando seleção</span></span>
+          <h2 class="detail__title" id="d-titulo">Selecione uma máquina</h2>
 
           <div class="metric">
             <div class="metric__head">
@@ -109,10 +109,10 @@
                 </svg>
                 Temperatura
               </span>
-              <span class="metric__value" id="d-temp">71.0°C</span>
+              <span class="metric__value" id="d-temp">—</span>
             </div>
             <div class="bar"><span class="bar__fill" id="d-temp-bar"></span></div>
-            <span class="metric__limit" id="d-temp-lim">Limite: 80°C</span>
+            <span class="metric__limit" id="d-temp-lim">Limite: —</span>
           </div>
 
           <div class="metric">
@@ -124,20 +124,20 @@
                 </svg>
                 Vibração
               </span>
-              <span class="metric__value" id="d-vib">1.10 mm/s</span>
+              <span class="metric__value" id="d-vib">—</span>
             </div>
             <div class="bar"><span class="bar__fill" id="d-vib-bar"></span></div>
-            <span class="metric__limit" id="d-vib-lim">Limite: 2.0 mm/s</span>
+            <span class="metric__limit" id="d-vib-lim">Limite: —</span>
           </div>
 
           <div class="kpis">
             <div class="kpi">
               <span class="kpi__label">Eficiência</span>
-              <span class="kpi__value" id="d-efic">98%</span>
+              <span class="kpi__value" id="d-efic">—</span>
             </div>
             <div class="kpi">
               <span class="kpi__label">Uptime</span>
-              <span class="kpi__value" id="d-uptime">4h 22m</span>
+              <span class="kpi__value" id="d-uptime">—</span>
             </div>
           </div>
 
@@ -181,7 +181,7 @@
         Sem visibilidade dos dados, a equipe só percebe o problema após a parada.
       </p>
 
-      <button type="button" class="cta cta--falha" id="btn-falha">
+      <button type="button" class="cta cta--falha" id="btn-falha" disabled>
         <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
           <path d="M6 4l14 8-14 8z"/>
         </svg>
@@ -191,6 +191,8 @@
           <path d="M5 12h14M13 6l6 6-6 6"/>
         </svg>
       </button>
+
+      <p class="sim__dica" id="dica-selecao">Selecione uma máquina para iniciar a falha</p>
 
       <!-- Tela 3: próxima simulação (rota ainda não existe) -->
       <a class="cta cta--proxima" id="btn-proxima" href="#" hidden>
