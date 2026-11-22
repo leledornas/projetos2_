@@ -44,10 +44,19 @@
           <span class="status-bzu__dot"></span>
           Monitoramento BZU: INATIVO
         </span>
+
+        <!-- Tela 3: o Reiniciar sobe para o conteúdo -->
+        <a class="btn-reiniciar sim__reiniciar" href="{% url 'core:intro' %}">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+          </svg>
+          Reiniciar
+        </a>
       </div>
 
       <h1 class="sim__title">Sem monitoramento BZU</h1>
-      <p class="sim__lead">
+      <p class="sim__lead" id="sim-lead">
         A produção está funcionando normalmente. Observe o que acontece quando uma
         máquina apresenta uma falha sem nenhum alerta antecipado.
       </p>
@@ -132,16 +141,45 @@
             </div>
           </div>
 
+          <div class="detail__aviso" id="d-aviso" hidden>
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor"
+                 stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+            <span id="d-aviso-txt"></span>
+          </div>
+
           <span class="detail__note">* dados ilustrativos</span>
         </section>
 
-        <section class="panel panel--timeline" aria-labelledby="timeline-titulo">
-          <h2 class="panel__label" id="timeline-titulo">Linha do tempo</h2>
-          <ol class="timeline" id="timeline">
-            <li class="timeline__empty">Aguardando início</li>
-          </ol>
-        </section>
+        <div class="col-right">
+          <section class="panel panel--timeline" aria-labelledby="timeline-titulo">
+            <h2 class="panel__label" id="timeline-titulo">Linha do tempo</h2>
+            <ol class="timeline" id="timeline">
+              <li class="timeline__empty">Aguardando início</li>
+            </ol>
+          </section>
+
+          <!-- Tela 3: impacto estimado -->
+          <section class="panel panel--impacto" id="painel-impacto" aria-labelledby="impacto-titulo" hidden>
+            <h2 class="panel__label" id="impacto-titulo">Impacto estimado (simulado)</h2>
+            <div class="impactos">
+              {% for i in impactos %}
+                <div class="impacto" data-valor="{{ i.valor }}" data-prefixo="{{ i.prefixo }}" data-sufixo="{{ i.sufixo }}">
+                  <span class="impacto__valor">—</span>
+                  <span class="impacto__rotulo">{{ i.rotulo }}</span>
+                  <span class="impacto__sub">{{ i.sub }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          </section>
+        </div>
       </div>
+
+      <p class="insight" id="insight" hidden>
+        <strong>Uma falha isolada pode gerar impactos em toda a cadeia produtiva.</strong>
+        Sem visibilidade dos dados, a equipe só percebe o problema após a parada.
+      </p>
 
       <button type="button" class="cta cta--falha" id="btn-falha">
         <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" aria-hidden="true">
@@ -153,6 +191,15 @@
           <path d="M5 12h14M13 6l6 6-6 6"/>
         </svg>
       </button>
+
+      <!-- Tela 3: próxima simulação (rota ainda não existe) -->
+      <a class="cta cta--proxima" id="btn-proxima" href="#" hidden>
+        Continuar para a próxima simulação
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </a>
 
     </main>
 
