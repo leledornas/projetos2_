@@ -25,26 +25,28 @@ MAQUINAS_SIM1 = [
      "eficiencia": 99, "uptime": "4h 22m"},
 ]
 
-# Sequência da falha (Tela 3): cada evento aparece na linha do tempo e muda o
-# estado de uma máquina. "atraso" = ms de espera ANTES do evento (ritmo da demo).
+# Sequência da falha (Tela 3): cada evento entra na linha do tempo e, quando tem
+# "maquina", muda o estado dela. "tom" = cor do marcador (ok / erro / aviso).
+# "atraso" = ms de espera ANTES do evento (ritmo da animação).
 SEQUENCIA_FALHA = [
-    {"tempo": "00:00", "maquina": 2, "estado": "falha", "alerta": True, "atraso": 600,
-     "texto": "Máquina 02 ultrapassa o limite de temperatura. Nenhum alerta é emitido.",
-     "temp": 86.0, "vib": 2.40, "efic": 74},
-    {"tempo": "00:12", "maquina": 2, "estado": "falha", "alerta": True, "atraso": 1800,
-     "texto": "Máquina 02 para de operar.",
-     "temp": 93.0, "vib": 3.10, "efic": 0},
-    {"tempo": "00:20", "maquina": 3, "estado": "parada", "alerta": False, "atraso": 1800,
-     "texto": "Máquina 03 fica sem peças para montar e para.",
-     "efic": 0},
-    {"tempo": "00:31", "maquina": 4, "estado": "parada", "alerta": False, "atraso": 1800,
-     "texto": "Máquina 04 fica sem material e a finalização para.",
-     "efic": 0},
-    {"tempo": "00:45", "maquina": 1, "estado": "parada", "alerta": False, "atraso": 1800,
-     "texto": "Máquina 01 não tem para onde enviar o material e para.",
-     "efic": 0},
-    {"tempo": "00:50", "maquina": None, "estado": None, "alerta": True, "atraso": 1500,
-     "texto": "Linha de produção totalmente parada."},
+    {"hora": "10:00", "texto": "Linha em operação normal",
+     "tom": "ok", "atraso": 0},
+    {"hora": "10:15", "texto": "Máquina 02 — falha completa",
+     "tom": "erro", "atraso": 800, "maquina": 2, "estado": "erro", "efic": 0},
+    {"hora": "10:45", "texto": "Produção acumula atraso",
+     "tom": "aviso", "atraso": 800, "maquina": 3, "estado": "afetada", "efic": 0},
+    {"hora": "11:30", "texto": "Pedido impactado — prazo em risco",
+     "tom": "aviso", "atraso": 800, "maquina": 4, "estado": "afetada", "efic": 0},
+    {"hora": "12:00", "texto": "Custos estimados em crescimento",
+     "tom": "aviso", "atraso": 800, "maquina": 1, "estado": "afetada", "efic": 0},
+]
+
+# Cards "Impacto estimado (simulado)" — valores ilustrativos
+IMPACTOS = [
+    {"valor": 140, "prefixo": "",   "sufixo": "min", "rotulo": "Tempo perdido", "sub": "produção"},
+    {"valor": 72,  "prefixo": "",   "sufixo": "h",   "rotulo": "Atraso",        "sub": "no pedido"},
+    {"valor": 38,  "prefixo": "R$", "sufixo": "k",   "rotulo": "Custo est.",    "sub": "ilustrativo"},
+    {"valor": 4,   "prefixo": "",   "sufixo": "/4",  "rotulo": "Etapas",        "sub": "afetadas"},
 ]
 
 
@@ -62,6 +64,7 @@ def simulacao1(request):
         "maquinas": MAQUINAS_SIM1,
         "selecionada": 2,
         "sequencia": SEQUENCIA_FALHA,
+        "impactos": IMPACTOS,
         "passos": _passos(1),
     })
 
