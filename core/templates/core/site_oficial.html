@@ -1,0 +1,53 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IoTech · Site oficial</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core/css/intro.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/site_oficial.css' %}">
+</head>
+<body>
+  <div class="app app--figma">
+
+    <header class="topbar">
+      <a class="logo" href="{% url 'core:intro' %}" aria-label="IoTech">
+        <img src="{% static 'core/img/logo.svg' %}" alt="IoTech" width="80" height="21">
+      </a>
+      <nav class="stepper" aria-label="Progresso">
+        {% for passo in passos %}
+          <div class="step{% if passo.ativo %} is-active{% endif %}">
+            <span class="step__bar"></span>
+            <span class="step__label">{{ passo.label }}</span>
+          </div>
+        {% endfor %}
+      </nav>
+    </header>
+
+    <!-- Frame do Figma: 1167 x 976 -> 775 (animação "Tela 2") -->
+    <main class="tela" id="tela">
+      <div class="tela__body">
+        <!-- TODO: substituir pelo conteúdo real do frame (textos, cards, ícones) -->
+        <h1 class="tela__title">Título da tela</h1>
+        <p class="tela__lead">Texto de apoio da tela.</p>
+
+        <div class="tela__actions">
+          <!-- GhostBtn · clique → Tela 2 -->
+          <a class="btn btn--ghost" id="ghost-btn" href="{% url proxima_url %}">GhostBtn</a>
+          <!-- PrimaryBtn · hover muda variante · clique → Tela 4 (rota ainda não existe) -->
+          <a class="btn btn--primary" id="primary-btn" href="#">PrimaryBtn</a>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span>BZU • IoTech — Simulador de Efeito Dominó</span>
+      <span>Valores ilustrativos · Prova de conceito</span>
+    </footer>
+
+  </div>
+</body>
+</html>
