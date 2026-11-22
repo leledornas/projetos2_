@@ -41,3 +41,11 @@ def simulacao1(request):
         "selecionada": 2,
         "passos": _passos(1),
     })
+
+def site_oficial(request):
+    # Frame "site-oficial" do Figma (node 1-266): 1167x976, fundo #08041A.
+    # O GhostBtn leva para a Tela 2 (animação de altura 976 -> 775).
+    return render(request, "core/site_oficial.html", {
+        "passos": _passos(0),
+        "proxima_url": "core:simulacao1",   # GhostBtn -> Tela 2
+    })
