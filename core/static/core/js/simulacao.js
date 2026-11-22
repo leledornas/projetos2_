@@ -241,13 +241,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (btnFalha) btnFalha.addEventListener("click", iniciarFalha);
 
-  // "Continuar para a próxima simulação": rota ainda não existe
-  const btnProxima = $("btn-proxima");
-  if (btnProxima) {
-    btnProxima.addEventListener("click", (e) => {
-      e.preventDefault();
-      document.dispatchEvent(new CustomEvent("simulador:proxima"));
-      // TODO: apontar para a Simulação 2 quando existir
-    });
-  }
+  // Continuar da Tela 3 para a Tela 4 (Intervalo)
+const btnProxima = $("btn-proxima");
+
+if (btnProxima) {
+  btnProxima.addEventListener("click", () => {
+    document.dispatchEvent(new CustomEvent("simulador:proxima"));
+  });
+}
 });

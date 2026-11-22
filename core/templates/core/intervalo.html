@@ -1,0 +1,546 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intervalo | Simulador BZU</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #07040f;
+            --bg-soft: #0c0719;
+            --line: rgba(124, 58, 237, 0.28);
+            --text: #ece6ff;
+            --muted: #6b5a9e;
+            --dim: #2e2150;
+            --magenta: #e600e6;
+            --violet: #8b1dff;
+            --font: "Outfit", system-ui, sans-serif;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            min-height: 100%;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background:
+                radial-gradient(
+                    ellipse 60% 45% at 50% 38%,
+                    rgba(110, 30, 200, 0.10),
+                    transparent 70%
+                ),
+                var(--bg);
+        }
+
+        /* CABEÇALHO */
+
+        .topbar {
+            height: 40px;
+            flex: 0 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 0 22px;
+            border-bottom: 1px solid var(--line);
+            background: rgba(8, 4, 18, 0.9);
+        }
+
+        .logo {
+            position: absolute;
+            left: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            color: #b342e9;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .logo img {
+            display: block;
+            height: 21px;
+            width: auto;
+        }
+
+        /* ETAPAS */
+
+        .stepper {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step + .step::before {
+            content: "";
+            width: 6px;
+            height: 2px;
+            border-radius: 2px;
+            background: var(--dim);
+        }
+
+        .step__bar {
+            width: 8px;
+            height: 3px;
+            border-radius: 3px;
+            background: #1d1238;
+        }
+
+        .step__label {
+            font-size: 9px;
+            font-weight: 400;
+            color: #2c2050;
+            white-space: nowrap;
+        }
+
+        .step.is-complete .step__bar {
+            background: #7c3aed;
+        }
+
+        .step.is-complete .step__label {
+            color: #7c65b5;
+        }
+
+        .step.is-active .step__bar {
+            width: 38px;
+            background: linear-gradient(
+                90deg,
+                #8b1dff,
+                #e600e6
+            );
+            box-shadow: 0 0 8px rgba(214, 0, 255, 0.55);
+        }
+
+        .step.is-active .step__label {
+            color: #c026d3;
+        }
+
+        /* REINICIAR */
+
+        .btn-reiniciar {
+            position: absolute;
+            right: 22px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            height: 28px;
+            padding: 0 14px;
+            border-radius: 8px;
+            font-family: var(--font);
+            font-size: 11px;
+            font-weight: 400;
+            color: #a78bfa;
+            text-decoration: none;
+            background: rgba(20, 8, 44, 0.7);
+            border: 1px solid rgba(124, 58, 237, 0.32);
+            transition: background 0.18s ease;
+        }
+
+        .btn-reiniciar:hover {
+            background: rgba(88, 28, 135, 0.35);
+            color: #ddd0ff;
+        }
+
+        /* CONTEÚDO PRINCIPAL */
+
+        .intervalo {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+            padding: 45px 24px 65px;
+        }
+
+        .interrogacao {
+            font-size: 58px;
+            font-weight: 300;
+            line-height: 1;
+            color: #a52add;
+            margin-bottom: 25px;
+        }
+
+        .intervalo__titulo {
+            max-width: 850px;
+            font-size: clamp(30px, 3.6vw, 44px);
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.015em;
+            color: #efe9ff;
+        }
+
+        .intervalo__titulo span {
+            display: block;
+            background: linear-gradient(
+                90deg,
+                #7a1bff,
+                #d400d4
+            );
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .intervalo__descricao {
+            margin-top: 30px;
+            max-width: 580px;
+            font-size: 15px;
+            line-height: 25px;
+            font-weight: 300;
+            color: var(--muted);
+        }
+
+        /* CARD */
+
+        .card {
+            width: 100%;
+            max-width: 390px;
+            margin-top: 38px;
+            padding: 25px 27px;
+            border-radius: 12px;
+            text-align: left;
+            background: rgba(22, 8, 48, 0.38);
+            border: 1px solid rgba(88, 40, 170, 0.28);
+        }
+
+        .card__titulo {
+            font-size: 13px;
+            font-weight: 600;
+            color: #cfc0ff;
+            margin-bottom: 20px;
+        }
+
+        .card__lista {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card__item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 300;
+            color: #8a6fd0;
+        }
+
+        .card__icone {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            color: #a78bfa;
+        }
+
+        .card__icone svg {
+            width: 17px;
+            height: 17px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* BOTÃO PRINCIPAL */
+
+        .cta {
+            margin-top: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            min-height: 48px;
+            padding: 0 34px;
+            border-radius: 12px;
+            font-family: var(--font);
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            background: linear-gradient(
+                90deg,
+                #8a12ff 0%,
+                #c20ae6 55%,
+                #ff00e0 100%
+            );
+            box-shadow:
+                0 0 28px rgba(190, 20, 255, 0.45),
+                0 4px 18px rgba(120, 0, 220, 0.35);
+            transition:
+                transform 0.18s ease,
+                box-shadow 0.18s ease;
+        }
+
+        .cta:hover {
+            transform: translateY(-2px);
+            box-shadow:
+                0 0 40px rgba(210, 30, 255, 0.6),
+                0 6px 24px rgba(120, 0, 220, 0.45);
+        }
+
+        .cta svg {
+            width: 17px;
+            height: 17px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* RODAPÉ */
+
+        .footer {
+            min-height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 22px;
+            border-top: 1px solid rgba(124, 58, 237, 0.18);
+            font-size: 9px;
+            font-weight: 300;
+            color: #2f2358;
+        }
+
+        /* RESPONSIVIDADE */
+
+        @media (max-width: 860px) {
+            .stepper .step__label {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .topbar {
+                padding: 0 12px;
+            }
+
+            .logo {
+                left: 12px;
+                font-size: 16px;
+            }
+
+            .btn-reiniciar {
+                right: 12px;
+                padding: 0 8px;
+            }
+
+            .intervalo {
+                padding: 50px 20px;
+            }
+
+            .intervalo__titulo {
+                font-size: 30px;
+            }
+
+            .intervalo__descricao {
+                font-size: 13px;
+                line-height: 22px;
+            }
+
+            .card {
+                padding: 22px;
+            }
+
+            .cta {
+                padding: 15px 20px;
+                font-size: 12px;
+            }
+
+            .footer {
+                flex-direction: column;
+                justify-content: center;
+                gap: 4px;
+                padding: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <!-- CABEÇALHO -->
+    <header class="topbar">
+
+        <a href="{% url 'core:intro' %}" class="logo">
+            <img src="{% static 'core/img/logo.svg' %}" alt="ioTech">
+        </a>
+
+        <nav class="stepper" aria-label="Etapas da simulação">
+
+            <div class="step is-complete">
+                <span class="step__bar"></span>
+                <span class="step__label">Início</span>
+            </div>
+
+            <div class="step is-complete">
+                <span class="step__bar"></span>
+                <span class="step__label">Simulação 1</span>
+            </div>
+
+            <div class="step is-active" aria-current="step">
+                <span class="step__bar"></span>
+                <span class="step__label">Intervalo</span>
+            </div>
+
+            <div class="step">
+                <span class="step__bar"></span>
+                <span class="step__label">Simulação 2</span>
+            </div>
+
+            <div class="step">
+                <span class="step__bar"></span>
+                <span class="step__label">Comparativo</span>
+            </div>
+
+        </nav>
+
+        <a href="{% url 'core:intro' %}" class="btn-reiniciar">
+            ↻ Reiniciar
+        </a>
+
+    </header>
+
+    <!-- CONTEÚDO -->
+    <main class="intervalo">
+
+        <div class="interrogacao" aria-hidden="true">?</div>
+
+        <h1 class="intervalo__titulo">
+            E se fosse possível identificar o problema
+            <span>antes da parada completa?</span>
+        </h1>
+
+        <p class="intervalo__descricao">
+            Na próxima simulação, você acompanhará a mesma
+            situação com o monitoramento BZU ativo.
+            Observe o que muda quando uma anomalia é
+            identificada antecipadamente pelos sensores
+            — e como isso pode influenciar as decisões
+            da equipe.
+        </p>
+
+        <!-- RECURSOS -->
+        <section class="card">
+
+            <h2 class="card__titulo">
+                O que você vai encontrar na próxima simulação:
+            </h2>
+
+            <ul class="card__lista">
+
+                <li class="card__item">
+                    <span class="card__icone">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 20v-8"/>
+                            <path d="M8 16a6 6 0 0 1 0-8"/>
+                            <path d="M16 16a6 6 0 0 0 0-8"/>
+                            <path d="M5 19a10 10 0 0 1 0-14"/>
+                            <path d="M19 19a10 10 0 0 0 0-14"/>
+                            <circle cx="12" cy="10" r="2"/>
+                        </svg>
+                    </span>
+                    Sensores IoT conectados às máquinas
+                </li>
+
+                <li class="card__item">
+                    <span class="card__icone">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 3 2 21h20L12 3Z"/>
+                            <path d="M12 9v5"/>
+                            <path d="M12 18h.01"/>
+                        </svg>
+                    </span>
+                    Alerta precoce de anomalia
+                </li>
+
+                <li class="card__item">
+                    <span class="card__icone">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M3 3v18h18"/>
+                            <path d="m6 15 5-5 4 3 5-7"/>
+                        </svg>
+                    </span>
+                    Dados para análise em tempo real
+                </li>
+
+                <li class="card__item">
+                    <span class="card__icone">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="4" width="18" height="14" rx="2"/>
+                            <path d="M8 22h8"/>
+                            <path d="M12 18v4"/>
+                            <path d="m7 13 3-3 3 2 4-5"/>
+                        </svg>
+                    </span>
+                    Painel de decisão para a equipe
+                </li>
+
+            </ul>
+        </section>
+
+        <!-- BOTÃO -->
+        <a href="#" class="cta">
+            Conhecer a simulação com BZU
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 12h14"/>
+                <path d="m13 6 6 6-6 6"/>
+            </svg>
+        </a>
+
+    </main>
+
+    <!-- RODAPÉ -->
+    <footer class="footer">
+        <span>BZU · IoTech — Simulador de Efeito Dominó</span>
+        <span>Valores ilustrativos · Prova de conceito</span>
+    </footer>
+
+</div>
+</body>
+</html>
+
+
+
+

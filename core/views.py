@@ -79,3 +79,9 @@ def site_oficial(request):
         "passos": _passos(0),
         "proxima_url": "core:simulacao1",   # GhostBtn -> Tela 2
     })
+
+
+def intervalo(request):
+    return render(request, "core/intervalo.html", {
+        "passos": _passos(2),
+    })
