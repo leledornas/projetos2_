@@ -276,19 +276,38 @@
   padding-top: 8px;
 }
 .timeline__item {
+  position: relative;
   display: flex;
-  align-items: baseline;
-  gap: 10px;
-  padding: 6px 0;
-  font-size: 10.5px;
-  font-weight: 300;
-  color: #cfc0ff;
-  border-bottom: 1px solid rgba(88, 40, 170, 0.18);
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 0 13px 20px;
 }
-.timeline__item:last-child { border-bottom: 0; }
-.timeline__time { font-weight: 600; color: #a855f7; min-width: 34px; }
-.timeline__item.is-alert .timeline__time,
-.timeline__item.is-alert .timeline__text { color: #f0443c; }
+.timeline__item:last-child { padding-bottom: 0; }
+.timeline__item::before {            /* marcador colorido */
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tom, #8b1dff);
+}
+.timeline__item::after {             /* linha que liga os marcadores */
+  content: "";
+  position: absolute;
+  left: 3.5px;
+  top: 14px;
+  bottom: -4px;
+  width: 1px;
+  background: rgba(88, 40, 170, 0.45);
+}
+.timeline__item:last-child::after { display: none; }
+.timeline__time { font-size: 8px; font-weight: 300; color: #6b4fb0; }
+.timeline__text { font-size: 10.5px; font-weight: 400; color: #f1ecff; }
+.timeline__item.tom-ok    { --tom: #64ab65; }
+.timeline__item.tom-erro  { --tom: #f0443c; }
+.timeline__item.tom-aviso { --tom: #ff9514; }
 
 /* ---------- Botão Iniciar falha ---------- */
 .cta--falha {
@@ -321,32 +340,112 @@
   .sim__tags { flex-wrap: wrap; }
 }
 
-/* ---------- Tela 3: propagação da falha (efeito dominó) ---------- */
-.mcard.is-failing.is-selected { box-shadow: 0 0 22px rgba(240, 68, 60, 0.35); }
+/* =====================================================================
+   Tela 3 — resultado da falha
+   ===================================================================== */
+[hidden] { display: none !important; }
 
-.mcard.is-stopped { border-color: rgba(255, 149, 20, 0.6); background: rgba(80, 40, 6, 0.35); }
-.mcard.is-stopped.is-selected { box-shadow: 0 0 22px rgba(255, 149, 20, 0.25); }
-.mcard.is-stopped .mcard__status { color: #ff9514; }
-.mcard.is-stopped .dot { background: #ff9514; box-shadow: 0 0 8px rgba(255, 149, 20, 0.6); }
-.mcard.is-failing .mcard__icon { color: #f0443c; }
-.mcard.is-stopped .mcard__icon { color: #ff9514; }
-
-/* Status do painel de detalhes */
-.detail__status[data-estado="falha"]  { color: #f0443c; }
-.detail__status[data-estado="falha"] .dot  { background: #f0443c; box-shadow: 0 0 8px rgba(240, 68, 60, 0.7); }
-.detail__status[data-estado="parada"] { color: #ff9514; }
-.detail__status[data-estado="parada"] .dot { background: #ff9514; box-shadow: 0 0 8px rgba(255, 149, 20, 0.6); }
-
-/* Métrica acima do limite */
-.bar__fill.is-over { background: linear-gradient(90deg, #f0443c, #ff7a70); }
-.metric__value.is-over { color: #f0443c; }
-
-/* Entrada dos itens da linha do tempo */
-.timeline__item { animation: timeline-in 0.35s ease both; }
-@keyframes timeline-in {
+/* Entrada suave de elementos que aparecem */
+.aparece { animation: aparece 0.45s ease both; }
+@keyframes aparece {
   from { opacity: 0; transform: translateY(6px); }
   to   { opacity: 1; transform: none; }
 }
+.timeline__item { animation: aparece 0.35s ease both; }
 @media (prefers-reduced-motion: reduce) {
-  .timeline__item { animation: none; }
+  .aparece, .timeline__item { animation: none; }
+}
+
+/* Reiniciar: na Tela 3 sobe da topbar para a linha das tags */
+.btn-reiniciar.sim__reiniciar {
+  display: none;
+  position: static;
+  transform: none;
+  margin-left: auto;
+}
+.app.is-falha .btn-reiniciar.sim__reiniciar { display: inline-flex; }
+.app.is-falha .topbar .btn-reiniciar { display: none; }
+
+/* Botão "Iniciar falha" some quando a falha começa */
+.app.is-falha .cta--falha { display: none; }
+
+/* Cards das máquinas */
+.mcard.is-failing .mcard__icon { color: #f0443c; }
+.mcard.is-failing.is-selected { box-shadow: 0 0 24px rgba(240, 68, 60, 0.45); }
+.mcard.is-afetada .mcard__status { color: #f0443c; }
+.mcard.is-afetada .dot { background: #f0443c; box-shadow: 0 0 8px rgba(240, 68, 60, 0.7); }
+
+/* Painel de detalhes */
+.panel--detail { transition: none; }
+.app.is-falha .panel--detail { align-self: stretch; }
+.detail__status[data-estado="afetada"] { color: #f0443c; }
+.detail__status[data-estado="afetada"] .dot { background: #f0443c; box-shadow: 0 0 8px rgba(240, 68, 60, 0.7); }
+
+.bar__fill.is-over { background: linear-gradient(90deg, #f0443c, #ff7a70); }
+.metric__value.is-over { color: #f0443c; }
+.metric__value.is-dim { color: #4d3a86; }
+.kpi__value.is-zero { color: #f0443c; }
+.kpi__value.is-dim { color: #4d3a86; }
+
+.detail__aviso {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border-radius: 7px;
+  font-size: 9px;
+  font-weight: 400;
+  color: #a78bfa;
+  background: rgba(88, 28, 135, 0.3);
+  border: 1px solid rgba(124, 58, 237, 0.35);
+}
+
+/* Coluna da direita: linha do tempo + impacto */
+.col-right { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+/* Impacto estimado */
+.panel--impacto { padding: 14px 16px 16px; }
+.impactos { margin-top: 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.impacto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 6px 12px;
+  border-radius: 8px;
+  background: rgba(40, 14, 86, 0.5);
+  border: 1px solid rgba(100, 50, 200, 0.3);
+}
+.impacto__valor { font-size: 17px; font-weight: 700; color: #d9ccff; margin-bottom: 4px; }
+.impacto__rotulo { font-size: 8px; font-weight: 300; color: #8a6fd0; }
+.impacto__sub { font-size: 8px; font-weight: 300; color: #4d3a86; }
+
+/* Frase de aviso */
+.insight {
+  margin-top: 16px;
+  padding: 15px 22px;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 300;
+  color: #6b4fb0;
+  border-radius: 10px;
+  background: rgba(22, 8, 48, 0.38);
+  border: 1px solid rgba(88, 40, 170, 0.28);
+}
+.insight strong { font-weight: 600; color: #f1ecff; }
+
+/* CTA da próxima simulação */
+.cta--proxima {
+  align-self: center;
+  margin-top: 24px;
+  min-width: 0;
+  height: 46px;
+  padding: 0 30px;
+  gap: 9px;
+  font-size: 12.5px;
+}
+
+@media (max-width: 860px) {
+  .impactos { grid-template-columns: repeat(2, 1fr); }
 }
