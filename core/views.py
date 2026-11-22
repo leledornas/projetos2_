@@ -47,6 +47,7 @@ SEQUENCIA_FALHA = [
      "texto": "Linha de produção totalmente parada."},
 ]
 
+
 def _passos(ativo):
     return [{"label": l, "ativo": i == ativo} for i, l in enumerate(PASSOS_LABELS)]
 
@@ -63,6 +64,7 @@ def simulacao1(request):
         "sequencia": SEQUENCIA_FALHA,
         "passos": _passos(1),
     })
+
 
 def site_oficial(request):
     # Frame "site-oficial" do Figma (node 1-266): 1167x976, fundo #08041A.

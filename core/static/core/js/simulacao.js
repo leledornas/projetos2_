@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const cards = document.querySelectorAll(".mcard");
   const $ = (id) => document.getElementById(id);
+
   const ROTULOS = { aguardando: "Aguardando", falha: "Falha", parada: "Parada" };
   const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -29,7 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Escalas ilustrativas: temperatura 0–100 °C, vibração 0–4 mm/s
     $("d-temp-bar").style.width = pct(parseFloat(d.temp), 100) + "%";
     $("d-vib-bar").style.width = pct(parseFloat(d.vib), 4) + "%";
-        // Acima do limite → vermelho
+
+    // Acima do limite → vermelho
     const tempAlta = parseFloat(d.temp) > parseFloat(d.tempLim);
     const vibAlta = parseFloat(d.vib) > parseFloat(d.vibLim);
     $("d-temp-bar").classList.toggle("is-over", tempAlta);
@@ -41,7 +43,12 @@ document.addEventListener("DOMContentLoaded", () => {
   cards.forEach((card) => card.addEventListener("click", () => inspecionar(card)));
 
   const inicial = document.querySelector(".mcard.is-selected") || cards[0];
-  if (inicial) inspecionar(inicial);
+  try {
+    if (inicial) inspecionar(inicial);
+  } catch (e) {
+    // Não deixa um elemento faltando no HTML impedir o resto do script
+    console.error("[simulacao] erro ao montar o painel de detalhes:", e);
+  }
 
   // ---------- Tela 3: sequência da falha (efeito dominó) ----------
   const dadosSeq = document.getElementById("sequencia-falha");
@@ -51,11 +58,13 @@ document.addEventListener("DOMContentLoaded", () => {
     card.dataset.estado = estado;
     card.classList.toggle("is-failing", estado === "falha");
     card.classList.toggle("is-stopped", estado === "parada");
-    card.querySelector(".mcard__status-txt").textContent = ROTULOS[estado];
+    const txt = card.querySelector(".mcard__status-txt");
+    if (txt) txt.textContent = ROTULOS[estado];
   }
 
   function adicionarNaLinhaDoTempo(ev) {
     const lista = $("timeline");
+    if (!lista) return;
     const vazio = lista.querySelector(".timeline__empty");
     if (vazio) vazio.remove();
 
@@ -83,7 +92,9 @@ document.addEventListener("DOMContentLoaded", () => {
     aplicarEstado(card, ev.estado);
 
     // Se a máquina aberta no painel mudou, atualiza o painel
-    if (card.classList.contains("is-selected")) inspecionar(card);
+    if (card.classList.contains("is-selected")) {
+      try { inspecionar(card); } catch (e) { console.error("[simulacao] painel:", e); }
+    }
   }
 
   const btnFalha = $("btn-falha");
@@ -91,10 +102,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (btnFalha) {
     btnFalha.addEventListener("click", async () => {
+      console.log("[simulacao] clique em Iniciar falha; eventos:", sequencia.length);
+      if (!Array.isArray(sequencia) || sequencia.length === 0) {
+        console.error('[simulacao] sequência vazia: confira "sequencia" no views.py e o json_script no template.');
+        return;
+      }
       if (emAndamento) return;
       emAndamento = true;
       btnFalha.disabled = true;
-      $("btn-falha-txt").textContent = "Falha em andamento…";
+      const rotuloBtn = $("btn-falha-txt");
+      if (rotuloBtn) rotuloBtn.textContent = "Falha em andamento…";
       document.dispatchEvent(new CustomEvent("simulador:iniciar-falha"));
 
       for (const ev of sequencia) {
@@ -102,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         executarEvento(ev);
       }
 
-      $("btn-falha-txt").textContent = "Falha concluída";
+      if (rotuloBtn) rotuloBtn.textContent = "Falha concluída";
       document.dispatchEvent(new CustomEvent("simulador:falha-concluida"));
       // Próxima etapa (Intervalo / Simulação 2) ainda não existe.
     });
