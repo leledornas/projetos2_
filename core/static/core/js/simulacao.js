@@ -112,11 +112,23 @@ document.addEventListener("DOMContentLoaded", () => {
     lista.appendChild(li);
   }
 
-  function executarEvento(ev) {
-    adicionarNaLinhaDoTempo(ev);
-    if (!ev.maquina) return;
+  // Ordem em que a falha se propaga a partir da máquina de origem:
+  // primeiro as seguintes na linha, depois as anteriores (da mais próxima à mais distante).
+  function ordemDePropagacao(origem) {
+    const lista = Array.from(cards);
+    const i = lista.indexOf(origem);
+    return [...lista.slice(i + 1), ...lista.slice(0, i).reverse()];
+  }
 
-    const card = document.querySelector(`.mcard[data-id="${ev.maquina}"]`);
+  function executarEvento(ev, origem, fila) {
+    adicionarNaLinhaDoTempo({
+      ...ev,
+      texto: ev.texto.replace("{maquina}", origem.dataset.nome),
+    });
+
+    let card = null;
+    if (ev.alvo === "origem") card = origem;
+    else if (ev.alvo === "propagacao") card = fila.shift();
     if (!card) return;
     if (ev.efic !== undefined) card.dataset.efic = String(ev.efic);
     aplicarEstado(card, ev.estado);
@@ -161,7 +173,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     emAndamento = true;
-    document.dispatchEvent(new CustomEvent("simulador:iniciar-falha"));
+
+    // A falha começa na máquina que está selecionada agora
+    const origem = document.querySelector(".mcard.is-selected") || cards[0];
+    const fila = ordemDePropagacao(origem);
+    document.dispatchEvent(new CustomEvent("simulador:iniciar-falha", {
+      detail: { maquina: origem.dataset.id },
+    }));
 
     // A Tela 3 surge assim que o botão é apertado
     if (btnFalha) btnFalha.disabled = true;
@@ -171,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     for (const ev of sequencia) {
       await esperar(reduzMovimento ? 0 : ev.atraso);
-      executarEvento(ev);
+      executarEvento(ev, origem, fila);
     }
 
     setText("sim-lead", "Simulação concluída. Uma falha isolada gerou impacto em toda a cadeia.");

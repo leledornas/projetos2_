@@ -25,20 +25,23 @@ MAQUINAS_SIM1 = [
      "eficiencia": 99, "uptime": "4h 22m"},
 ]
 
-# Sequência da falha (Tela 3): cada evento entra na linha do tempo e, quando tem
-# "maquina", muda o estado dela. "tom" = cor do marcador (ok / erro / aviso).
-# "atraso" = ms de espera ANTES do evento (ritmo da animação).
+# Sequência da falha (Tela 3). A falha começa na máquina SELECIONADA quando o
+# botão é clicado e se propaga para as demais (primeiro as seguintes na linha,
+# depois as anteriores). Por isso os eventos não citam uma máquina fixa:
+#   "alvo": "origem"      -> a máquina que falhou   ({maquina} vira o nome dela)
+#   "alvo": "propagacao"  -> a próxima máquina afetada, na ordem da propagação
+# "tom" = cor do marcador (ok / erro / aviso); "atraso" = ms antes do evento.
 SEQUENCIA_FALHA = [
     {"hora": "10:00", "texto": "Linha em operação normal",
      "tom": "ok", "atraso": 0},
-    {"hora": "10:15", "texto": "Máquina 02 — falha completa",
-     "tom": "erro", "atraso": 800, "maquina": 2, "estado": "erro", "efic": 0},
+    {"hora": "10:15", "texto": "{maquina} — falha completa",
+     "tom": "erro", "atraso": 800, "alvo": "origem", "estado": "erro", "efic": 0},
     {"hora": "10:45", "texto": "Produção acumula atraso",
-     "tom": "aviso", "atraso": 800, "maquina": 3, "estado": "afetada", "efic": 0},
+     "tom": "aviso", "atraso": 800, "alvo": "propagacao", "estado": "afetada", "efic": 0},
     {"hora": "11:30", "texto": "Pedido impactado — prazo em risco",
-     "tom": "aviso", "atraso": 800, "maquina": 4, "estado": "afetada", "efic": 0},
+     "tom": "aviso", "atraso": 800, "alvo": "propagacao", "estado": "afetada", "efic": 0},
     {"hora": "12:00", "texto": "Custos estimados em crescimento",
-     "tom": "aviso", "atraso": 800, "maquina": 1, "estado": "afetada", "efic": 0},
+     "tom": "aviso", "atraso": 800, "alvo": "propagacao", "estado": "afetada", "efic": 0},
 ]
 
 # Cards "Impacto estimado (simulado)" — valores ilustrativos
