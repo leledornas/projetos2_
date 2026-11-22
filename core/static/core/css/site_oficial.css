@@ -1,0 +1,118 @@
+/* Frame "site-oficial" (Figma node 1-266) — estende intro.css (fonte, topbar, stepper, footer) */
+
+/* ---------- Tokens extraídos do painel de Cores do Figma ---------- */
+:root {
+  --fg-bg:            #08041A;  /* fundo do frame */
+  --fg-surface:       #100B26;
+  --fg-surface-2:     #20123D;
+  --fg-border:        #4D179A;
+  --fg-muted:         #6B5FA0;
+  --fg-text:          #EDE9FE;
+  --fg-white:         #FFFFFF;
+
+  --fg-violet-300:    #A684FF;
+  --fg-violet-400:    #8E51FF;
+  --fg-violet-500:    #7F22FE;
+  --fg-violet-600:    #7008E7;
+  --fg-violet-700:    #5D0EC0;
+  --fg-purple-900:    #3C0366;
+
+  --fg-magenta-300:   #F4A8FF;
+  --fg-magenta-400:   #ED6AFF;
+  --fg-magenta-500:   #B50BE6;
+  --fg-pink:          #FF00EE;
+
+  --fg-danger:        #F04147;
+  --fg-warning:       #FF9514;
+  --fg-success:       #64AB65;
+
+  /* Gradientes do Figma */
+  --fg-grad-primary:  linear-gradient(90deg, #8B18F5, #FF00EE);
+  --fg-grad-brand:    linear-gradient(180deg, #6700FF, #7C3ADD 50%, #DA48BC);
+
+  /* Medidas do frame */
+  --fg-w:        1167px;
+  --fg-h-inicio: 976px;
+  --fg-h-fim:    775px;
+}
+
+/* ---------- Frame ---------- */
+.app--figma { background: #050211; align-items: center; }
+
+.tela {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: min(var(--fg-w), 100%);
+  height: var(--fg-h-fim);          /* estado final (Tela 2) */
+  overflow: hidden;
+  background: var(--fg-bg);
+  color: var(--fg-text);
+
+  /* "Tela 2" — animação exportada do Figma + fill-mode para manter o estado final */
+  animation: kf_1_2_height_0 2.555234s linear forwards;
+}
+
+@keyframes kf_1_2_height_0 {
+  0% {
+    animation-timing-function: linear(0 0%, 0.0188 0.8%, 0.0679 1.6%, 0.1374 2.4%, 0.2195 3.2%, 0.308 4%, 0.3978 4.8%, 0.4856 5.6%, 0.5686 6.4%, 0.6452 7.2%, 0.7142 8%, 0.7753 8.8%, 0.8283 9.6%, 0.8735 10.4%, 0.9113 11.2%, 0.9423 12%, 0.9671 12.8%, 0.9866 13.6%, 1.0014 14.4%, 1.0123 15.2%, 1.0198 16%, 1.0247 16.8%, 1.0274 17.6%, 1.0283 18.4%, 1.0281 19.2%, 1.0268 20%, 1.025 20.8%, 1.0227 21.6%, 1.0202 22.4%, 1.0177 23.2%, 1.0152 24%, 1.0128 24.8%, 1.0106 25.6%, 1.0085 26.4%, 1.0068 27.2%, 1.0052 28%, 1.0039 28.8%, 1.0028 29.6%, 1.0018 30.4%, 1.0011 31.2%, 1.0005 32%, 1 32.8%, 0.9997 33.6%, 0.9995 34.4%, 0.9993 35.2%, 0.9992 36%, 0.9992 36.8%, 0.9992 37.6%, 0.9992 38.4%, 0.9993 39.2%, 0.9993 40%, 1 100%);
+    height: var(--fg-h-inicio);
+  }
+  100% { height: var(--fg-h-fim); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tela { animation: none; }
+}
+
+/* ---------- Conteúdo (placeholder: trocar pelo que está no Figma) ---------- */
+.tela__body {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 24px;
+  text-align: center;
+}
+
+.tela__title { font-size: clamp(28px, 3.6vw, 44px); font-weight: 700; line-height: 1.2; }
+.tela__lead  { max-width: 460px; font-size: 15px; line-height: 25px; font-weight: 300; color: var(--fg-muted); }
+
+.tela__actions { margin-top: 12px; display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* ---------- PrimaryBtn / GhostBtn ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  height: 48px;
+  padding: 0 32px;
+  border-radius: 12px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.btn--primary {
+  color: var(--fg-white);
+  border: 0;
+  background: var(--fg-grad-primary);
+  box-shadow: 0 0 28px rgba(190, 20, 255, .45);
+}
+.btn--primary:hover { transform: translateY(-1px); box-shadow: 0 0 40px rgba(210, 30, 255, .6); }
+
+.btn--ghost {
+  color: var(--fg-violet-300);
+  background: transparent;
+  border: 1px solid var(--fg-border);
+}
+.btn--ghost:hover { background: rgba(77, 23, 154, .3); border-color: var(--fg-violet-300); }
+
+.btn:focus-visible { outline: 2px solid var(--fg-magenta-400); outline-offset: 3px; }
