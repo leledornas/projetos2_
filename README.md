@@ -58,7 +58,7 @@ Este projeto propõe explorar de que forma a **Internet das Coisas (IoT)** pode 
 ---
  Deploy
 
-A aplicação está publicada em: 
+A aplicação está publicada em: https://iotech-p2.onrender.com
 
 ### Como acessar
 
