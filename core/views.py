@@ -53,6 +53,48 @@ IMPACTOS = [
 ]
 
 
+# ---------- Tela 6: Simulação 2 — decisão preventiva (com BZU) ----------
+# Mesmas máquinas da Simulação 1, mas a Máquina 02 já apresenta a anomalia
+# detectada pelo sensor (valores perto do limite). Valores ilustrativos.
+MAQUINAS_SIM2 = [dict(m) for m in MAQUINAS_SIM1]
+MAQUINAS_SIM2[1].update(temperatura=79.2, vibracao=1.85, eficiencia=91)
+
+# Como a Máquina 02 fica depois de "Acionar manutenção"
+MAQUINA2_ESTABILIZADA = {"temperatura": 72.0, "vibracao": 1.20, "eficiencia": 97}
+
+# Linha do tempo de cada momento da tela. "tom" = cor do marcador
+# (ok / erro / aviso); "atraso" = ms antes do evento aparecer.
+EVENTOS_DECISAO = {
+    "inicio": [
+        {"hora": "00:00", "texto": "Linha em operação normal", "tom": "ok"},
+        {"hora": "00:30", "texto": "Sensores detectam aumento de temperatura na Máquina 02",
+         "tom": "aviso"},
+        {"hora": "00:45", "texto": "Alerta preditivo: anomalia detectada antes da parada completa",
+         "tom": "aviso"},
+    ],
+    "verificar": [
+        {"hora": "00:50", "texto": "Operador verificou os dados da Máquina 02", "tom": "aviso"},
+    ],
+    "manutencao": [
+        {"hora": "01:00", "texto": "Manutenção acionada na Máquina 02", "tom": "ok", "atraso": 0},
+        {"hora": "01:15", "texto": "Máquina 02 estabilizada — temperatura e vibração normalizadas",
+         "tom": "ok", "atraso": 900, "maquina": 2, "estado": "normal"},
+        {"hora": "01:30", "texto": "Linha concluída sem parada", "tom": "ok", "atraso": 900},
+    ],
+    "ignorar": [
+        {"hora": "01:00", "texto": "Alerta ignorado pelo operador", "tom": "aviso", "atraso": 0},
+        {"hora": "01:15", "texto": "Máquina 02 — falha completa",
+         "tom": "erro", "atraso": 900, "maquina": 2, "estado": "erro"},
+        {"hora": "01:45", "texto": "Máquina 03 afetada — produção acumula atraso",
+         "tom": "aviso", "atraso": 900, "maquina": 3, "estado": "afetada"},
+        {"hora": "02:15", "texto": "Máquina 04 afetada — pedido impactado",
+         "tom": "aviso", "atraso": 900, "maquina": 4, "estado": "afetada"},
+        {"hora": "02:30", "texto": "Máquina 01 afetada — produção parada em toda a cadeia",
+         "tom": "aviso", "atraso": 900, "maquina": 1, "estado": "afetada"},
+    ],
+}
+
+
 def _passos(ativo):
     return [{"label": l, "ativo": i == ativo} for i, l in enumerate(PASSOS_LABELS)]
 
@@ -84,4 +126,17 @@ def site_oficial(request):
 def intervalo(request):
     return render(request, "core/intervalo.html", {
         "passos": _passos(2),
+    })
+
+
+def decisao(request):
+    # Tela 6: alerta de anomalia na Máquina 02 + decisão do operador (US04/US06).
+    return render(request, "core/decisao.html", {
+        "maquinas": MAQUINAS_SIM2,
+        "selecionada": 2,
+        "config": {
+            "eventos": EVENTOS_DECISAO,
+            "estabilizada": MAQUINA2_ESTABILIZADA,
+        },
+        "passos": _passos(3),
     })
