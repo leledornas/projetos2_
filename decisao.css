@@ -1,0 +1,100 @@
+/* Tela 6 — Simulação 2: decisão preventiva. Estende simulacao.css */
+
+/* ---------- Monitoramento BZU ativo ---------- */
+.status-bzu--ativo { color: #64ab65; }
+.status-bzu--ativo .status-bzu__dot {
+  background: #64ab65;
+  box-shadow: 0 0 6px rgba(100, 171, 101, 0.7);
+}
+
+/* ---------- Cards das máquinas ---------- */
+.mcard.is-alerta { border-color: rgba(255, 149, 20, 0.7); background: rgba(90, 50, 8, 0.4); }
+.mcard.is-alerta .mcard__icon { color: #ff9514; }
+.mcard.is-alerta .mcard__status { color: #ff9514; }
+.mcard.is-alerta .dot { background: #ff9514; box-shadow: 0 0 8px rgba(255, 149, 20, 0.7); }
+.mcard.is-alerta.is-selected { box-shadow: 0 0 24px rgba(255, 149, 20, 0.4); }
+
+.mcard.is-normal .mcard__status { color: #64ab65; }
+.mcard.is-normal .dot { background: #64ab65; box-shadow: 0 0 8px rgba(100, 171, 101, 0.7); }
+
+/* ---------- Painel de detalhes: estados da Tela 6 ---------- */
+.detail__status[data-estado="alerta"] { color: #ff9514; }
+.detail__status[data-estado="alerta"] .dot { background: #ff9514; box-shadow: 0 0 8px rgba(255, 149, 20, 0.7); }
+.detail__status[data-estado="normal"] { color: #64ab65; }
+.detail__status[data-estado="normal"] .dot { background: #64ab65; box-shadow: 0 0 8px rgba(100, 171, 101, 0.7); }
+.detail__status[data-estado="erro"] { color: #f0443c; }
+.detail__status[data-estado="erro"] .dot { background: #f0443c; box-shadow: 0 0 8px rgba(240, 68, 60, 0.7); }
+
+.bar__fill.is-warn { background: linear-gradient(90deg, #ff9514, #ffc069); }
+.metric__value.is-warn { color: #ff9514; }
+
+/* "Verificar dados" destaca o painel de detalhes por um instante */
+.panel--detail.is-destaque { animation: destaque 1.2s ease; }
+@keyframes destaque {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 149, 20, 0.6); border-color: rgba(255, 149, 20, 0.8); }
+  100% { box-shadow: 0 0 0 14px rgba(255, 149, 20, 0); }
+}
+
+/* ---------- Painel do alerta ---------- */
+.panel--alerta {
+  padding: 16px 18px 18px;
+  border-color: rgba(255, 149, 20, 0.45);
+  background: rgba(60, 32, 8, 0.28);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+.panel--alerta.is-resolvida { border-color: rgba(100, 171, 101, 0.5); background: rgba(14, 50, 22, 0.28); }
+.panel--alerta.is-falha { border-color: rgba(240, 68, 60, 0.5); background: rgba(70, 14, 22, 0.3); }
+
+.alerta__titulo { font-size: 13px; font-weight: 600; color: #ffb561; }
+.panel--alerta.is-resolvida .alerta__titulo { color: #8fd491; }
+.panel--alerta.is-falha .alerta__titulo { color: #ff8a82; }
+
+.alerta__texto {
+  margin-top: 8px;
+  font-size: 10.5px;
+  line-height: 15px;
+  font-weight: 300;
+  color: #b9a6e8;
+}
+.alerta__status { margin-top: 10px; font-size: 9.5px; font-weight: 500; color: #8a6fd0; }
+.alerta__status span { color: #ffb561; }
+.alerta__status span[data-fase="resolvendo"] { color: #a78bfa; }
+.alerta__status span[data-fase="resolvida"] { color: #8fd491; }
+.alerta__status span[data-fase="falha"] { color: #ff8a82; }
+
+.decisao { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; }
+
+.btn-decisao {
+  appearance: none;
+  cursor: pointer;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-family: var(--font);
+  font-size: 10.5px;
+  font-weight: 500;
+  color: #d9ccff;
+  background: rgba(40, 14, 86, 0.5);
+  border: 1px solid rgba(124, 58, 237, 0.45);
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+}
+.btn-decisao:hover:not(:disabled) { background: rgba(70, 28, 140, 0.6); border-color: rgba(150, 100, 255, 0.8); transform: translateY(-1px); }
+.btn-decisao:focus-visible { outline: 2px solid #c026d3; outline-offset: 2px; }
+.btn-decisao:disabled { opacity: 0.4; cursor: default; }
+
+.btn-decisao--primaria {
+  color: #fff;
+  border-color: transparent;
+  background: linear-gradient(90deg, #7a1bff, #c026d3);
+}
+.btn-decisao--primaria:hover:not(:disabled) { background: linear-gradient(90deg, #8a35ff, #d23be3); }
+
+/* ---------- Resultado da decisão ---------- */
+.resultado strong { display: block; margin-bottom: 3px; font-size: 12px; }
+.resultado[data-tom="ok"] strong { color: #8fd491; }
+.resultado[data-tom="erro"] strong { color: #ff8a82; }
+
+@media (max-width: 860px) {
+  .decisao { flex-direction: column; }
+  .btn-decisao { width: 100%; }
+}
