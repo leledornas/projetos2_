@@ -1,0 +1,208 @@
+{% load static %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>IoTech · Simulação 2 — Tomada de decisão preventiva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'core/css/intro.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/simulacao.css' %}">
+  <link rel="stylesheet" href="{% static 'core/css/decisao.css' %}">
+</head>
+<body>
+  <div class="app app--sim app--decisao" id="app">
+
+    <header class="topbar">
+      <a class="logo" href="{% url 'core:intro' %}" aria-label="IoTech">
+        <img src="{% static 'core/img/logo.svg' %}" alt="IoTech" width="80" height="21">
+      </a>
+
+      <nav class="stepper" aria-label="Progresso">
+        {% for passo in passos %}
+          <div class="step{% if passo.ativo %} is-active{% endif %}">
+            <span class="step__bar"></span>
+            <span class="step__label">{{ passo.label }}</span>
+          </div>
+        {% endfor %}
+      </nav>
+
+      <a class="btn-reiniciar" href="{% url 'core:intro' %}">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+        </svg>
+        Reiniciar
+      </a>
+    </header>
+
+    <main class="sim">
+
+      <div class="sim__tags">
+        <span class="tag tag--sim">Simulação 02</span>
+        <span class="status-bzu status-bzu--ativo">
+          <span class="status-bzu__dot"></span>
+          Monitoramento BZU: ATIVO
+        </span>
+      </div>
+
+      <h1 class="sim__title">Tomada de decisão preventiva</h1>
+      <p class="sim__lead">
+        O sensor detectou uma anomalia antes da parada. Escolha como agir e veja
+        o que acontece com a linha de produção.
+      </p>
+
+      <!-- Linha de produção -->
+      <section class="panel panel--line" aria-labelledby="linha-titulo">
+        <h2 class="panel__label" id="linha-titulo">Linha de produção — clique para inspecionar</h2>
+
+        <div class="line" role="tablist" aria-label="Máquinas da linha de produção">
+          {% for m in maquinas %}
+            <button type="button"
+                    class="mcard{% if m.id == selecionada %} is-selected{% endif %}"
+                    role="tab"
+                    aria-selected="{% if m.id == selecionada %}true{% else %}false{% endif %}"
+                    data-id="{{ m.id }}"
+                    data-nome="{{ m.nome }}"
+                    data-etapa="{{ m.etapa }}"
+                    data-estado="{% if m.id == selecionada %}alerta{% else %}operando{% endif %}"
+                    data-temp="{{ m.temperatura|stringformat:'.1f' }}"
+                    data-temp-lim="{{ m.temp_limite }}"
+                    data-vib="{{ m.vibracao|stringformat:'.2f' }}"
+                    data-vib-lim="{{ m.vib_limite|stringformat:'.1f' }}"
+                    data-efic="{{ m.eficiencia }}"
+                    data-uptime="{{ m.uptime }}">
+              <svg class="mcard__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="3"/>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+              <span class="mcard__name">{{ m.nome }}</span>
+              <span class="mcard__stage">{{ m.etapa }}</span>
+              <span class="mcard__status"><span class="dot"></span><span class="mcard__status-txt">Em operação</span></span>
+            </button>
+            {% if not forloop.last %}<span class="line__link" aria-hidden="true"></span>{% endif %}
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Detalhe da máquina + alerta de decisão + linha do tempo -->
+      <div class="grid">
+        <section class="panel panel--detail" id="detalhe" aria-live="polite">
+          <span class="detail__status" id="d-status" data-estado="operando"><span class="dot"></span><span id="d-status-txt">Em operação</span></span>
+          <h2 class="detail__title" id="d-titulo">Selecione uma máquina</h2>
+
+          <div class="metric">
+            <div class="metric__head">
+              <span class="metric__name">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                </svg>
+                Temperatura
+              </span>
+              <span class="metric__value" id="d-temp">—</span>
+            </div>
+            <div class="bar"><span class="bar__fill" id="d-temp-bar"></span></div>
+            <span class="metric__limit" id="d-temp-lim">Limite: —</span>
+          </div>
+
+          <div class="metric">
+            <div class="metric__head">
+              <span class="metric__name">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+                     stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                </svg>
+                Vibração
+              </span>
+              <span class="metric__value" id="d-vib">—</span>
+            </div>
+            <div class="bar"><span class="bar__fill" id="d-vib-bar"></span></div>
+            <span class="metric__limit" id="d-vib-lim">Limite: —</span>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <span class="kpi__label">Eficiência</span>
+              <span class="kpi__value" id="d-efic">—</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi__label">Uptime</span>
+              <span class="kpi__value" id="d-uptime">—</span>
+            </div>
+          </div>
+
+          <div class="detail__aviso" id="d-aviso" hidden>
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor"
+                 stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+              <path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="9"/>
+            </svg>
+            <span id="d-aviso-txt"></span>
+          </div>
+
+          <span class="detail__note">* dados ilustrativos</span>
+        </section>
+
+        <div class="col-right">
+          <!-- Alerta: o operador decide -->
+          <section class="panel panel--alerta" id="painel-alerta" aria-labelledby="alerta-titulo">
+            <h2 class="alerta__titulo" id="alerta-titulo">⚠️ Anomalia detectada — Máquina 02</h2>
+            <p class="alerta__texto">
+              O sensor detectou uma anomalia. Uma intervenção preventiva pode evitar
+              a propagação da falha. O que você deseja fazer?
+            </p>
+            <p class="alerta__status">
+              Status: <span id="alerta-status" data-fase="alerta">Aguardando decisão do operador</span>
+            </p>
+
+            <div class="decisao" role="group" aria-label="Ações do operador">
+              <button type="button" class="btn-decisao" data-acao="ignorar">Ignorar alerta</button>
+              <button type="button" class="btn-decisao" data-acao="verificar">Verificar dados</button>
+              <button type="button" class="btn-decisao btn-decisao--primaria" data-acao="manutencao">Acionar manutenção</button>
+            </div>
+          </section>
+
+          <section class="panel panel--timeline" aria-labelledby="timeline-titulo">
+            <h2 class="panel__label" id="timeline-titulo">Linha do tempo</h2>
+            <ol class="timeline" id="timeline"></ol>
+          </section>
+        </div>
+      </div>
+
+      <!-- Resultado da decisão -->
+      <p class="insight resultado" id="resultado" data-tom="ok" hidden>
+        <strong id="resultado-titulo"></strong>
+        <span id="resultado-texto"></span>
+      </p>
+
+      <button type="button" class="cta cta--proxima" id="btn-tentar" hidden>
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/>
+        </svg>
+        Tentar novamente
+      </button>
+
+      <!-- Próxima tela: comparativo final (rota ainda não existe) -->
+      <a class="cta cta--proxima" id="btn-comparativo" href="#" hidden>
+        Ver comparativo final
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+             stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M5 12h14M13 6l6 6-6 6"/>
+        </svg>
+      </a>
+
+    </main>
+
+    <footer class="footer">
+      <span>BZU • IoTech — Simulador de Efeito Dominó</span>
+      <span>Valores ilustrativos · Prova de conceito</span>
+    </footer>
+
+  </div>
+  {{ config|json_script:"config-decisao" }}
+  <script src="{% static 'core/js/decisao.js' %}"></script>
+</body>
+</html>
