@@ -140,3 +140,6 @@ def decisao(request):
         },
         "passos": _passos(3),
     })
+
+def tela5(request):
+    return render(request, 'core/tela5.html')
